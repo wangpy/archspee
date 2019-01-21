@@ -1,0 +1,16 @@
+[Unit]
+Description=archspee
+After=network.target
+
+[Service]
+Environment="DISPLAY=:0"
+Environment="XAUTHORITY=/home/pi/.Xauthority"
+ExecStart=/bin/bash /opt/archspee/run.sh
+WorkingDirectory=/opt/archspee
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
