@@ -11,7 +11,7 @@ Build your own super smart display with Raspberry Pi and **archspee**. It is Hig
   - Register different trigger to different service / handler for different purposes.
   - Split your different scenario to different NLU application to manage them with ease.
 - Super easy to extend (add your own NLU rules and add / extend handler module or just add new intent script files)
-  - It's possible to also integrate Google Assistant, Alexa, or both at the same time.
+  - It's possible to also integrate Google Assistant, Alexa, or BOTH at the same time.
 - Designed for smart display scenario in mind:
   - Providing visual feedback presentation module for notification icon, notification bubbles and activity graphics
   - Providing a [default application](#default-application) to use YouTube TV and perform some device operations with voice
@@ -202,7 +202,7 @@ Customization can be easily made by putting custom configuration and modules int
 ### Add your Own Action and Intent Script to Perform Device Action
 
 The default application is using [Wit.ai](https://wit.ai) to perform natural language understanding. The Wit app data is exported and put in the repository. You can get the app data and import in your own Wit app to extend it.
-1. Get the exported app data zip file [here](https://github.com/wangpy/archspee/blob/master/samples/wit_data/BrowserYouTubeTvEn-2019-01-20-17-19-02.zip).
+1. Get the exported app data zip file [here](https://github.com/wangpy/archspee/blob/master/samples/wit_data/RaspberryPiControl-2019-01-20-17-17-11.zip).
 2. Create an app in Wit.ai and import the app data zip file above.
 3. You can train the app to understand new intent values. (Refer to the [official getting started guide](https://wit.ai/getting-started) and the tutorials to understand how to do it)
 4. Put a script `[new_intent_value].sh` in `intent_scripts` folder.
