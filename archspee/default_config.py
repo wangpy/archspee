@@ -1,11 +1,5 @@
-import os
-
-_CREDENTIALS = {}
-for key in ['WIT_ACCESS_TOKEN', 'WIT_ACCESS_TOKEN_2', 'OLAMI_APP_KEY', 'OLAMI_APP_SECRET']:
-    _CREDENTIALS[key] = ''
-    if key in os.environ:
-        _CREDENTIALS[key] = os.environ[key]
-
+_WIT_ACCESS_TOKEN_FOR_BROWSER_TV = '3QTEIGPP4YXNRN6DKPDOLV46EQLSGIUJ'
+_WIT_ACCESS_TOKEN_FOR_DEVICE_CONTROL = 'IEGTTI2YDCBYGF6ZYR7AVI2ZOVXLOSMI'
 
 LISTENERS = [
     ( 'archspee.listeners.alsa_port_audio.AlsaPortAudioListener', {} )
@@ -17,7 +11,7 @@ TRIGGERS = [
         {
             'decoder_model': [
                 'third_party/snowboy/resources/snowboy.umdl',
-                'third_party/snowboy/resources/alexa.umdl'
+                'third_party/snowboy/resources/alexa_02092017.umdl'
             ],
             'trigger_ids': [1, 2],
             'sensitivity': [],
@@ -40,7 +34,7 @@ RECOGNIZERS = [
     (
         1,
         'archspee.recognizers.wit.WitRecognizer',
-        { 'access_token': _CREDENTIALS['WIT_ACCESS_TOKEN'] }
+        { 'access_token': _WIT_ACCESS_TOKEN_FOR_BROWSER_TV }
     ),
     # this recognizer does not include interpreting so need to hook another interpreter to this trigger ID
     (
@@ -54,7 +48,7 @@ INTERPRETERS = [
     (
         2,
         'archspee.interpreters.wit.WitInterpreter',
-        { 'access_token': _CREDENTIALS['WIT_ACCESS_TOKEN_2'] }
+        { 'access_token': _WIT_ACCESS_TOKEN_FOR_DEVICE_CONTROL }
     )
 ]
 
