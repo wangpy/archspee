@@ -24,9 +24,9 @@ Build your own Raspberry Pi smart display with **archspee** - Highly modularized
 
 ### Default Application
 
-This is the appication which the author actually uses in his daily life. Anyone can easily modify / extend the application following the steps in [Customization](#customization) section. 
+This is the appication which the author actually uses in his daily life. Anyone can easily modify / extend the application following the steps in [Customization](#customization) section.
 
-- Browse YouTube TV website (same website which Firefox TV uses) / [Neverthink](https://neverthink.tv/) website 
+- Browse YouTube TV website (same website which Firefox TV uses) / [Neverthink](https://neverthink.tv/) website
   - Speak **Snowboy** hotword and issue the following command:
     - **`Move (Down|Up|Left|Right) [number] times`**
     - **`Select`** (the current focused item)
@@ -36,7 +36,7 @@ This is the appication which the author actually uses in his daily life. Anyone 
     - **`Go back`**
     - **`Seek (forward|back) [number] seconds`**
     - **`Give me some random [topic] videos`**: Opens a new tab to [Neverthink](https://neverthink.tv/) and play the specified topic channel.
-- Perform device action 
+- Perform device action
   - Speak **Alexa** hotword and issue the following command:
     - **`Show me the IP`**: Open a terminal window and show network interface IP addresses for 10 seconds
     - **`Wakeup`**: Exit the blank screensaver
@@ -45,6 +45,7 @@ This is the appication which the author actually uses in his daily life. Anyone 
 Click the following image to watch the demo video:
 
 [![Watch YouTube using Raspberry Pi Smart Display with Puffin Internet Terminal](http://img.youtube.com/vi/Al8i7aQ4tA4/0.jpg)](http://www.youtube.com/watch?v=Al8i7aQ4tA4 "Watch YouTube using Raspberry Pi Smart Display with Puffin Internet Terminal")
+(Note that the current released **Puffin Internet Terminal** does not have the fullscreen feature yet. The demo below is using an development build.)
 
 ## Installation
 
@@ -99,7 +100,7 @@ You can install **Puffin Internet Terminal** by either of the two ways:
 
 You need to make sure you have configured your audio devices correctly to use **archspee**. The following instruction in this part is cited from [Google Assistant Library Documentaion](https://developers.google.com/assistant/sdk/guides/library/python/embed/audio).
 
-1.  Find your recording and playback devices. 
+1.  Find your recording and playback devices.
     1.  Locate your USB microphone in the list of capture hardware devices. Write down the card number and device number.
 		```
         arecord -l
@@ -109,30 +110,30 @@ You need to make sure you have configured your audio devices correctly to use **
 		aplay -l
 		```
 2.  Create a new file named  `.asoundrc`  in the home directory (`/home/pi`). Make sure it has the right slave definitions for microphone and speaker; use the configuration below but replace  `<card number>`  and  `<device number>`  with the numbers you wrote down in the previous step. Do this for both  `pcm.mic`  and  `pcm.speaker`.
-	```    
-    pcm.!default  { type asym  
-      capture.pcm "mic" playback.pcm "speaker"  
-    }  
-    pcm.mic { type plug  
-      slave { pcm "hw:<card number>,<device number>"  }  
-    }  
-    pcm.speaker { type plug  
-      slave { pcm "hw:<card number>,<device number>"  }  
-    }  
+	```
+    pcm.!default  { type asym
+      capture.pcm "mic" playback.pcm "speaker"
+    }
+    pcm.mic { type plug
+      slave { pcm "hw:<card number>,<device number>"  }
+    }
+    pcm.speaker { type plug
+      slave { pcm "hw:<card number>,<device number>"  }
+    }
     ```
 3.  Verify that recording and playback work:
     1.  Adjust the playback volume.
 		```
 		alsamixer
-		```        
+		```
         Press the up arrow key to set the playback volume level to around 70.
-        
+
     2.  Play a test sound (this will be a person speaking). Press Ctrl+C when done. If you don't hear anything when you run this, check your speaker connection.
 	     ```
         speaker-test -t wav
 	    ```
     3.  Record a short audio clip.
-		```        
+		```
         arecord --format=S16_LE --duration=5 --rate=16000 --file-type=raw out.raw
            ```
     4.  Check the recording by replaying it. If you don't hear anything, you may need to check the recording volume in  `alsamixer`.
@@ -140,9 +141,9 @@ You need to make sure you have configured your audio devices correctly to use **
         aplay --format=S16_LE --rate=16000 out.raw
            ```
     If recording and playback are working, then you are done configuring audio. If not, check that the microphone and speaker are properly connected. If this is not the issue, then try a different microphone or speaker.
-    
+
     Note that if you have both an HDMI monitor and a 3.5mm jack speaker connected, you can play audio out of either one. Run the following command:
-	```    
+	```
 	sudo raspi-config
 	```
     Go to  **Advanced options > Audio**  and select the desired output device.
