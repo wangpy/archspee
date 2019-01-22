@@ -45,6 +45,7 @@ This is the appication which the author actually uses in his daily life. Anyone 
 Click the following image to watch the demo video:
 
 [![Watch YouTube using Raspberry Pi Smart Display with Puffin Internet Terminal](http://img.youtube.com/vi/Al8i7aQ4tA4/0.jpg)](http://www.youtube.com/watch?v=Al8i7aQ4tA4 "Watch YouTube using Raspberry Pi Smart Display with Puffin Internet Terminal")
+
 (Note that the current released **Puffin Internet Terminal** does not have the fullscreen feature yet. The demo below is using an development build.)
 
 ## Installation
