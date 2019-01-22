@@ -257,7 +257,12 @@ When designing the scenarios you want to provide the actions for, each scenario 
 - `SnowboyTrigger` emits trigger ID **`2`** via  **Alexa** hotword -> `GoogleSpeechRecognizer` -> `WitInterpreter` -> `ScriptsIntentHandler`
 
 Note that the trigger ID is not exclusively bound between each connection:
-- Different triggers can emit same trigger ID.
-- Intent data from same trigger ID after STT and NLU, it can be processed by multiple handlers at the same time. This enables the possibility to map multiple handlers from the same trigger, but normally each different intent values should be handled by only one of the handlers.
+- Different `Trigger`s can emit same **trigger ID**.
+  - For example, we can let a trigger ID get emitted by a hotword and also a push button.
+- The same natural text input recognizerd by the same `Recognizer` (in the same **trigger ID**) can be sent to multiple `Interpreter`s.
+  - This makes the separation of NLU apps for different scanarios possible and easy to integrate in the same flow (same **trigger ID**).
+- The intent / entities data from same trigger ID after STT and NLU can be processed by multiple `Handler`s at the same time. This enables the possibility to map multiple handlers from the same trigger, but normally each different intent values should be handled by only one of the handlers.
+  - For example, an NLU which generate intents for multiple purposes, we can let multiple handlers receive the same intent / entities data and see if any one of them handles it.
+  
 
 This gives maximum flexibility to combine modules to build for different multi-purposed scenarios.
