@@ -13,6 +13,7 @@ class WitRecognizer(RecognizerBase):
         super(WitRecognizer, self).__init__(text_callback, intent_callback, error_callback)
         assert access_token != ""
         self.access_token = access_token
+        self.request_pool = grequests.Pool(2)
 
     def response_callback(self, trigger_id, r, *args, **kwargs):
         # response example:
@@ -48,7 +49,6 @@ class WitRecognizer(RecognizerBase):
         headers = {'Authorization': 'Bearer '+self.access_token, 'Content-Type': _CONTENT_TYPE}
         callback = lambda r, *args, **kwargs: self.response_callback(trigger_id, r, *args, **kwargs)
         hooks = {'response': [callback]}
-        req = grequests.post(url, headers=headers, data=audio_data, hooks=hooks)
-        job = grequests.send(req, grequests.Pool(1))
+        req = grequests.post(url, headers=headers, data=audio_data, hooks=hooks, timeout=10)
+        job = grequests.send(req, self.request_pool)
         self.logger.debug("request sent")
-        

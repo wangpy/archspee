@@ -2,7 +2,9 @@ from archspee.interpreters import InterpreterBase
 import grequests
 import json
 import traceback
-from urllib.parse import quote_plus
+import threading
+import time
+from urllib.parse import quote
 
 _LOG_LEVEL = 'DEBUG'
 
@@ -12,6 +14,7 @@ class WitInterpreter(InterpreterBase):
         super(WitInterpreter, self).__init__(intent_callback, error_callback)
         assert access_token != ""
         self.access_token = access_token
+        self.request_pool = grequests.Pool(2)
 
     def response_callback(self, trigger_id, r, *args, **kwargs):
         # response example:
@@ -27,7 +30,7 @@ class WitInterpreter(InterpreterBase):
         #   },
         #   "msg_id" : "1W3bRED50G49ot6SE"
         # }
-        self.logger.debug("response received, trigger_id=%d, r.text=%s" % (trigger_id, r.text))
+        print("response received, trigger_id=%d, r.text=%s" % (trigger_id, r.text))
         try:
             response = json.loads(r.text)
             text = response['_text']
@@ -42,13 +45,17 @@ class WitInterpreter(InterpreterBase):
             self.logger.warning("exception occured")
             self.invoke_error_callback(trigger_id, r.status_code, r.text)
 
-    def interpret(self, trigger_id, text):
-        url = 'https://api.wit.ai/speech?v=20160526&q=' + quote_plus(text)
+    def req_task(self, trigger_id, text):
+        url = 'https://api.wit.ai/message?v=20160526&q=' + quote(text)
         self.logger.debug('request URL=%s' % url)
         headers = {'Authorization': 'Bearer '+self.access_token}
         callback = lambda r, *args, **kwargs: self.response_callback(trigger_id, r, *args, **kwargs)
         hooks = {'response': [callback]}
-        req = grequests.get(url, headers=headers, hooks=hooks)
-        job = grequests.send(req, grequests.Pool(1))
-        self.logger.debug("request sent")
-        
+        req = grequests.get(url, headers=headers, hooks=hooks, timeout=10)
+        job = grequests.send(req, self.request_pool)
+        time.sleep(5) # FIXME: necessary to receive response callback
+
+    def interpret(self, trigger_id, text):
+        req_task = lambda: self.req_task(trigger_id, text)
+        req_thread = threading.Thread(target=req_task)
+        req_thread.start()
