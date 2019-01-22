@@ -258,6 +258,6 @@ When designing the scenarios you want to provide the actions for, each scenario 
 
 Note that the trigger ID is not exclusively bound between each connection:
 - Different triggers can emit same trigger ID.
-- Intent data from same trigger ID after STT and NLU, it can be processed by multiple handlers at the same time.
+- Intent data from same trigger ID after STT and NLU, it can be processed by multiple handlers at the same time. This enables the possibility to map multiple handlers from the same trigger, but normally each different intent values should be handled by only one of the handlers.
 
 This gives maximum flexibility to combine modules to build for different multi-purposed scenarios.
