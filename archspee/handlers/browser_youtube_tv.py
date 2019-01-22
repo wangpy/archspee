@@ -66,8 +66,10 @@ class BrowserYouTubeTVIntentHandler(HandlerBase):
             notify_send('select search result index=%d' % index, 'You spoke: '+spoken_text, 'info')
             for _ in range(6):
                 _send_key('Down')
+            time.sleep(0.5)
             for _ in range(index-1):
                 _send_key('Right')
+            time.sleep(0.5)
             _send_key('Return')
         elif 'move_direction' in entities:
             move_direction = entities['move_direction'][0]['value']
@@ -102,9 +104,13 @@ class BrowserYouTubeTVIntentHandler(HandlerBase):
                 'forward': 'Right'
             }
             _send_key('Up')
-            for _ in range(count):
+            time.sleep(0.5)
+            _send_key('Up')
+            for _ in range(count+1):
+                time.sleep(0.2)
                 _send_key(seek_direction_key_map[seek_direction])
-            _send_key('Escape')
+            time.sleep(0.5)
+            _send_key('Return')
         elif operation == 'page_pause_media' or operation == 'page_resume_media':
             notify_send('toggle media playing', 'You spoke: '+spoken_text, 'info')
             _send_key('space')
