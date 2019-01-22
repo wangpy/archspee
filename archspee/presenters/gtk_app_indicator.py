@@ -4,13 +4,19 @@ from archspee.listeners import ListenerStatus
 import threading
 import gi
 gi.require_version('Gtk', '3.0')
+gi.require_version('Gdk', '3.0')
 gi.require_version('AppIndicator3', '0.1')
 gi.require_version('Notify', '0.7')
-from gi.repository import GLib, Gtk, GObject
+from gi.repository import GLib, Gtk, GObject, Gdk
 from gi.repository import AppIndicator3
 from gi.repository import Notify
 
-_LOG_LEVEL = None # 'DEBUG'
+try:
+    gi.require_foreign("cairo")
+except ImportError:
+    print("No pycairo integration :(")
+
+_LOG_LEVEL = 'DEBUG'
 
 _APPINDICATOR_ID = 'myappindicator'
 _ICONS = [
@@ -33,12 +39,85 @@ class GtkAppIndicatorPresenter(PresenterBase):
         self.indicator = None
         self.menu_item_active = None
         self.thread = None
+        self.top_window = None
+        self.double_buffer = None
 
     def notify_show(self, title, body):
         Notify.Notification.new(title, body).show()
 
     def set_indicator_icon(self, name):
         GLib.idle_add(self.indicator.set_icon, name)
+
+    def configure_top_window(self, widget, event, data=None):
+        self.logger.debug('configure_top_window')
+        # Destroy previous buffer
+        if self.double_buffer is not None:
+            self.double_buffer.finish()
+            self.double_buffer = None
+
+        # Create a new buffer
+        self.double_buffer = cairo.ImageSurface(\
+                cairo.FORMAT_ARGB32,
+                widget.get_allocated_width(),
+                widget.get_allocated_height()
+            )
+
+        # Initialize the buffer
+        self.draw_double_buffer()
+
+        return False
+
+    def draw_double_buffer(self):
+        """Draw something into the buffer"""
+        db = self.double_buffer
+        if db is not None:
+            # Create cairo context with double buffer as is DESTINATION
+            ctx = cairo.Context(db)
+            # Scale to device coordenates
+            ctx.scale(db.get_width(), db.get_height())
+            ctx.set_source_rgb(40, 175, 205)
+            ctx.retangle(0, 0, db.get_width(), db.get_height())
+            ctx.fill()
+
+    def draw_top_window(self, da, ctx):
+        self.logger.debug('draw_top_window')
+        if self.double_buffer is not None:
+            cr.set_source_surface(self.double_buffer, 0.0, 0.0)
+            cr.paint()
+        else:
+            print('Invalid double buffer')
+        return False
+
+    def destroy_top_window(self):
+        if self.top_window is None:
+            return
+        w = self.top_window
+        if not w.emit("delete-event", Gdk.Event(Gdk.EventType.DELETE)):
+            w.destroy()
+        self.top_window = None
+
+    def create_top_window(self):
+        if self.top_window is not None:
+            return
+        w = Gtk.Window()
+        screen = Gdk.Screen.get_default()
+        sw = screen.get_width()
+        sh = screen.get_height()
+        w.set_size_request(sw, 10)
+        w.move(0, sh-10)
+        w.set_decorated(False)
+        #w.set_has_frame(False)
+        w.set_title('Archspee is active')
+        w.set_skip_taskbar_hint(True)
+        w.set_border_width(10)
+        w.set_keep_above(True)
+        da = Gtk.DrawingArea()
+        da.set_size_request(sw, 10)
+        w.add(da)
+        da.connect('draw', self.draw_top_window)
+        da.connect('configure-event', self.configure_top_window)
+        w.show()
+        self.top_window = w
 
     def on_listener_status(self, trigger_id, status, is_disabled):
         if status != self.status or is_disabled != self.disabled:
@@ -47,11 +126,15 @@ class GtkAppIndicatorPresenter(PresenterBase):
             else:
                 if self.processing:
                     status = ListenerStatus.processing
-                elif status.value == 1:
-                    GLib.idle_add(self.notify_show, 'At Your Service.', 'trigger_id=%d' % trigger_id)
+                #elif status.value == 1:
+                #    GLib.idle_add(self.notify_show, 'At Your Service.', 'trigger_id=%d' % trigger_id)
                 elif status.value == 2:
                     GLib.idle_add(self.notify_show, 'Speak What You Want...', '')
                 self.set_indicator_icon(_ICONS[status.value])
+            if status.value == 0:
+                GLib.idle_add(self.destroy_top_window)
+            else:
+                GLib.idle_add(self.create_top_window)
             self.logger.debug('status changed: from %s to %s' % (repr(self.status), repr(status)))
             self.status = status
             self.disabled = is_disabled
