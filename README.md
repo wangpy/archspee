@@ -159,23 +159,44 @@ You need to make sure you have configured your audio devices correctly to use **
 - Launch **archspee** manually:
   1. Enter the repository: `cd archspee/`
   2. Execute run script: `./run.sh`
+  3. For [default application](#default-application), you should see the browser launches and an notification in taskbar.
+  4. Try the voice commands listed in [default application](#default-application) section.
+  5. If it does not work, refer to [troubleshooting](#troubleshooting) section.
 - Install the `systemd` service to launch **archspee** on boot:
   1. Execute service installer script: `scripts/service_installer.sh`
   2. To uninstall, run the service uninstaller script: `scripts/service_uninstaller.sh`
+
+## Troubleshooting
+
+- Unable to launch **archspee** or not seeing the notification icon or the browser window.
+  - Ensure no other program is using the microphone (verify your audio works by checking the steps in [Configure and Test the Audio](#configure-and-test-the-audio) section).
+  - Typically you need to be in desktop environment to use **archspee**. (However it can still be customized to be voice only assistant by removing `GtkAppIndicatorPresenter` and `BrowserYouTubeTVHandler` which needs desktop environment)
+- No response to the voice commands.
+  - Verify your audio works by checking the steps in [Configure and Test the Audio](#configure-and-test-the-audio) section.
+  - Maybe Snowboy is not picking up your hotword. You can verify your assigned hotword model works by checking the steps in [Change or add your own hotwords](#change-or-add-your-own-hotwords) section.
+- The hotword triggered, The action is not triggered after receiving the voice command.
+  - Check your **trigger ID** is assigned in by all the components so your voice command can go through the full flow with the **trigger ID**. (Refer to [Designing Scenarios](#designing-scenarios) section for detail)
+  - If you have set up **archspee** by system service, you can stop the service and run **archspee** manually and check the log output:
+    - `sudo systemctl stop archspee.service`
+    - `cd \<archspee_path\>; ./run.sh`
+    - To restart: `sudo systemctl start archspee.service`
 
 ## Customization
 
 Customization can be easily made by putting custom configuration and modules into `custom` directory:
 1. Copy from default configuration files: \
    `cp archspee/default_config.py custom/config.py`
-2. **(Optional)** [Add your own hotwords](#add-your-own-hotwords) or [add additional trigger methods](#add-additional-trigger-methods) (push button, etc)
+2. **(Optional)** [Change or add your own hotwords](#change-or-add-your-own-hotwords) or [add additional trigger methods](#add-additional-trigger-methods) (push button, etc)
 3. **(Optional)** [Add additional status indicators (presenters)](#add-additional-status-indicators-presenters)
 4. **(Optional)** [Add your own action and Intent Script to perform device action](#add-your-own-action-and-intent-script-to-perform-device-action)
 5. **(Optional)** [Integrate with other STT or NLU service](#integrate-with-other-stt-or-nlu-service)
 6. **(Optional)** For further customization / extension, refer to the [architecture section](#archspee-architecture)
 
-### Add Your Own Hotwords
+### Change or Add Your Own Hotwords
 
+Snowboy provides several hotwords as "universal models" which you can utilize: **Snowboy**, **Alexa**, **Jarvis** and **Smart Mirror**. You can refer to [Snowboy documentation](https://github.com/kitt-ai/snowboy#pretrained-universal-models) for details. These universal models are included in this repository in `third_party/snowboy/resources` directory.
+
+If you want to train your own hotword, you can train a personal model for it with the following steps:
 1. Register an account on [Snowboy website](https://snowboy.kitt.ai) and get your API key on user profile page (as documented [here](http://docs.kitt.ai/snowboy/#api-v1-train))
 2. Train a personal model using Snowboy API: \
    `SNOWBOY_API_TOKEN=<TOKEN> env/bin/python scripts/train_snowboy_model.py out.pmdl` \
@@ -184,6 +205,12 @@ Customization can be easily made by putting custom configuration and modules int
    `PYTHONPATH=$PWD/third_party/snowboy env/bin/python scripts/test_snowboy_model.py`
 4. Move the `out.pmdl` to `custom` folder and rename.
 5. Modify `custom/config.py` to replace the hotword you want to replace in `decoder_model` list to yours in `SnowboyTrigger` settings.
+
+However please note the personal models are much less solid in terms of detection accuracy and portability to different environment, and is not valid to be invoked across different users. We suggest you train the personal model with the following tips in mind:
+
+- It's better to choose a hotword with at 3 or more syllables
+- If your device is put to a new environment (placed in another room, or microphone used, or device placement / relative position with speaker changed dramatically, etc.), we suggest you to retrain the model for the new environment.
+
 
 ### Add Additional Trigger Methods
 
@@ -251,7 +278,7 @@ It's possible to integrate Google Assistant, Alexa or other voice assistant libr
   
 ### Designing Scenarios
 
-When designing the scenarios you want to provide the actions for, each scenario can be assigned a unique **trigger ID** so they can be processed by designated `Recognizer`, (maybe also `Interpreter` if the recognizer only performs STT) and `Handler`. Take the default application as example:
+When designing the scenarios you want to provide the actions for, each scenario can be assigned a unique **trigger ID** so they can be processed by designated `Recognizer`, (maybe also `Interpreter` if the recognizer only performs STT) and `Handler`. Take the [default application](#default-application) as example:
 
 - `SnowboyTrigger` emits trigger ID **`1`** via **Snowboy** hotword -> `WitRecognizer` -> `BrowserYouTubeTVIntentHandler`
 - `SnowboyTrigger` emits trigger ID **`2`** via  **Alexa** hotword -> `GoogleSpeechRecognizer` -> `WitInterpreter` -> `ScriptsIntentHandler`
