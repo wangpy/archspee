@@ -37,7 +37,7 @@ class PixelsPresenter(PresenterBase):
 
     def on_recognization_started(self, trigger_id):
         self.processing = True
-        self.on_listener_status(trigger_id, ListenerStatus.processing, self.disabled))
+        self.on_listener_status(trigger_id, ListenerStatus.processing, self.disabled)
 
     def on_intent_handled(self, trigger_id, spoken_text, intent, entities, summary, body, level):
         self.processing = False
