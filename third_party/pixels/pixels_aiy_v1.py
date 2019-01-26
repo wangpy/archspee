@@ -16,7 +16,6 @@ class Pixels:
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(_GPIO_PIN, GPIO.OUT)
-        self.next = threading.Event()
         self.queue = queue.Queue()
         self.off()
 
@@ -27,23 +26,18 @@ class Pixels:
 
 
     def wakeup(self, direction=0):
-        self.next.set()
         self.queue.put((1, 1))
 
     def listen(self):
-        self.next.set()
-        self.queue.put((3, 3))
-
-    def think(self):
-        self.next.set()
         self.queue.put((5, 5))
 
+    def think(self):
+        self.queue.put((3, 3))
+
     def speak(self):
-        self.next.set()
         self.queue.put((10, 0))
 
     def off(self):
-        self.next.set()
         self.queue.put((0, 10))
 
     def _set_light_on(self, on):
@@ -52,13 +46,11 @@ class Pixels:
 
     def _run(self):
         while True:
-            (on_count, off_count) = self.queue.get()
-            self.light_on_count = on_count
-            self.light_off_count = off_count
+            while not self.queue.empty():
+                (self.light_on_count, self.light_off_count) = self.queue.get()
             self.is_light_on = 0
             self.count_down = 0
-            self.next.clear()
-            while not self.next.is_set():
+            while self.queue.empty():
                 if self.count_down == 0:
                     self.is_light_on = not self.is_light_on
                     if self.is_light_on:
@@ -68,7 +60,6 @@ class Pixels:
                     if self.count_down == 0:
                         continue
                     self._set_light_on(self.is_light_on)
-                #print('is_on=%d, count_down=%d' % (self.is_light_on, self.count_down))
                 time.sleep(0.1)
                 self.count_down -= 1
 

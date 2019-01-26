@@ -21,6 +21,7 @@ class PixelsPresenter(PresenterBase):
                 pixels.off()
             elif self.processing:
                 pixels.think()
+                status = ListenerStatus.processing
             elif status is ListenerStatus.waiting_for_silence:
                 pixels.wakeup()
             elif status is ListenerStatus.waiting_for_speech:
@@ -28,10 +29,7 @@ class PixelsPresenter(PresenterBase):
             elif status is ListenerStatus.recording:
                 pixels.speak()
             elif status is ListenerStatus.standby:
-                if self.status is ListenerStatus.recording:
-                    pixels.think()
-                else:
-                    pixels.off()
+                pixels.off()
             self.status = status
             self.disabled = is_disabled
 
