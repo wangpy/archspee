@@ -34,5 +34,6 @@ class ScriptsIntentHandler(HandlerBase):
         try:
             script_pathname = str(p.resolve())
             subprocess_call(['bash', script_pathname])
+            notify_send('Execute script: %s' % script_filename, 'You spoke: '+spoken_text, 'info')
         except:
             notify_send('Script not found: %s' % script_filename, 'You spoke: '+spoken_text, 'discard')
