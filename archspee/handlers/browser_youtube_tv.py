@@ -88,7 +88,9 @@ class BrowserYouTubeTVIntentHandler(HandlerBase):
         elif 'topic' in entities:
             topic = entities['topic'][0]['value']
             notify_send('play random videos about %s' % topic, 'You spoke: '+spoken_text, 'info')
-            self.open_browser('https://neverthink.tv/'+topic.replace(' ', '-'))
+            self.open_browser('https://tv.neverthink.tv/'+topic.replace(' ', '-'))
+            time.sleep(2)
+            _send_key('Return')
         elif operation == 'go_back':
             # put this in front of 'seek_direction' because it might detect 'back'
             notify_send('go back', 'You spoke: '+spoken_text, 'info')
@@ -118,5 +120,20 @@ class BrowserYouTubeTVIntentHandler(HandlerBase):
         elif operation == 'page_select' or operation == 'skip_ad':
             notify_send('select current focused item', 'You spoke: '+spoken_text, 'info')
             _send_key('Return')
+        elif operation == 'close_tab':
+            _send_key('ctrl+w')
+        elif operation == 'next_channel':
+            notify_send('next channel', 'You spoke: '+spoken_text, 'info')
+            _send_key('Right')
+            _send_key('Right')
+            _send_key('Return')
+        elif operation == 'previous_channel':
+            notify_send('previous channel', 'You spoke: '+spoken_text, 'info')
+            _send_key('Left')
+            _send_key('Left')
+            _send_key('Return')
+        elif operation == 'open_youtube_tv':
+            notify_send('open YouTube TV', 'You spoke: '+spoken_text, 'info')
+            self.open_browser('https://www.youtube.com/tv/')
         else:
             notify_send('noop - do nothing', 'You spoke: '+spoken_text, 'discard')
