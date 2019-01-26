@@ -89,7 +89,7 @@ You can install **Puffin Internet Terminal** by either of the two ways:
 2. Apply the following configuration change using **`raspi-config`**
    1. `sudo raspi-config`
    2. Go to  **Advanced options > GL Driver**  and select **`G1 GL (Full KMS)`**.
-   3. Go to  **Advanced options > Memory Split**  and change settings to  **`384`**.
+   3. modify CMA settings to **384M** by adding `cma=384M` in `/boot/cmdline.txt`.
    4. Exit the Configuration Tool and reboot.
 3. Install the Debian package: `sudo dpkg -i puffin-internet-terminal-demo_7.7.x-dev_armhf.deb` (Change the file name according to your actual downloaded file)
 4. **(Only for system with DSI/SPI display)** Follow [the steps](#set-gl-driver-to-fake-kms) to set GL Driver to Fake KMS.
@@ -202,7 +202,7 @@ If you want to train your own hotword, you can train a personal model for it wit
    `SNOWBOY_API_TOKEN=<TOKEN> env/bin/python scripts/train_snowboy_model.py out.pmdl` \
    (Change the **\<TOKEN\>** to your Snowboy API token)
 3. Test your personal model: \
-   `PYTHONPATH=$PWD/third_party/snowboy env/bin/python scripts/test_snowboy_model.py`
+   `PYTHONPATH=$PWD:$PWD/third_party/snowboy env/bin/python scripts/test_snowboy_model.py`
 4. Move the `out.pmdl` to `custom` folder and rename.
 5. Modify `custom/config.py` to replace the hotword you want to replace in `decoder_model` list to yours in `SnowboyTrigger` settings.
 
