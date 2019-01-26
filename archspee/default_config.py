@@ -58,7 +58,7 @@ HANDLERS = [
         'archspee.handlers.browser_youtube_tv.BrowserYouTubeTVIntentHandler',
         {
             'browser_exec': 'puffin_demo',
-            'args': '--kiosk'
+            'args': ['--kiosk']
         }
     ),
     (

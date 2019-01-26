@@ -27,7 +27,7 @@ def _send_text_input(text):
 class BrowserYouTubeTVIntentHandler(HandlerBase):
     def __init__(self, intent_handled_callback, error_handled_callback,
                  browser_exec='chromium-browser',
-                 args='',
+                 args=[],
                  homepage_url='https://www.youtube.com/tv/#/channel?c=UC4R8DWoMoI7CAwX8_LjQHig&resume',
                  search_url_prefix='https://www.youtube.com/tv/#/search?resume&q='):
         self.__log_level = _LOG_LEVEL
@@ -37,8 +37,8 @@ class BrowserYouTubeTVIntentHandler(HandlerBase):
         self.search_url_prefix = search_url_prefix
         self.open_browser(homepage_url)
 
-    def open_browser(self, url, args=""):
-        _open_browser(self.browser_exec, url, args=[self.browser_args, args])
+    def open_browser(self, url, args=[]):
+        _open_browser(self.browser_exec, url, args=self.browser_args+args)
 
     def handle_error(self, trigger_id, status_code, response_text):
         self.invoke_error_handled_callback(trigger_id, status_code, response_text, 'Error occured', response_text, 'error')
