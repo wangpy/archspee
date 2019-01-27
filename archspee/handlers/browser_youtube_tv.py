@@ -7,12 +7,15 @@ from gi.repository import GLib
 
 _LOG_LEVEL = 'DEBUG'
 
+_YOUTUBE_TV_LIVE_CHANNELS_URL = 'https://www.youtube.com/tv/#/channel?c=UC4R8DWoMoI7CAwX8_LjQHig&resume'
+_YOUTUBE_TV_SEARCH_QUERY_URL_PREFIX = 'https://www.youtube.com/tv/#/search?resume&q='
+_NEVERTHINK_TV_URL_PREFIX = 'https://tv.neverthink.tv/'
+
 def subprocess_call(args):
     GLib.idle_add(subprocess.call, args)
 
 def _open_browser(browser_exec, url, args=[]):
-    cmds = ['xdotool', 'exec', browser_exec] + args
-    cmds.append(url)
+    cmds = ['xdotool', 'exec', browser_exec] + args + [url]
     subprocess_call(cmds)
 
 def _xdotool(command_list):
@@ -28,8 +31,8 @@ class BrowserYouTubeTVIntentHandler(HandlerBase):
     def __init__(self, intent_handled_callback, error_handled_callback,
                  browser_exec='chromium-browser',
                  args=[],
-                 homepage_url='https://www.youtube.com/tv/#/channel?c=UC4R8DWoMoI7CAwX8_LjQHig&resume',
-                 search_url_prefix='https://www.youtube.com/tv/#/search?resume&q='):
+                 homepage_url=_YOUTUBE_TV_LIVE_CHANNELS_URL,
+                 search_url_prefix=_YOUTUBE_TV_SEARCH_QUERY_URL_PREFIX):
         self.__log_level = _LOG_LEVEL
         super(BrowserYouTubeTVIntentHandler, self).__init__(intent_handled_callback, error_handled_callback)
         self.browser_exec = browser_exec
@@ -88,7 +91,7 @@ class BrowserYouTubeTVIntentHandler(HandlerBase):
         elif 'topic' in entities:
             topic = entities['topic'][0]['value']
             notify_send('play random videos about %s' % topic, 'You spoke: '+spoken_text, 'info')
-            self.open_browser('https://tv.neverthink.tv/'+topic.replace(' ', '-'))
+            self.open_browser(_NEVERTHINK_TV_URL_PREFIX+topic.replace(' ', '-'))
             time.sleep(2)
             _send_key('Return')
         elif operation == 'go_back':
@@ -132,8 +135,8 @@ class BrowserYouTubeTVIntentHandler(HandlerBase):
             _send_key('Left')
             _send_key('Left')
             _send_key('Return')
-        elif operation == 'open_youtube_tv':
+        elif operation == 'open_youtube_tv' or operation == 'show_live_channels':
             notify_send('open YouTube TV', 'You spoke: '+spoken_text, 'info')
-            self.open_browser('https://www.youtube.com/tv/')
+            self.open_browser(_YOUTUBE_TV_LIVE_CHANNELS_URL)
         else:
             notify_send('noop - do nothing', 'You spoke: '+spoken_text, 'discard')
