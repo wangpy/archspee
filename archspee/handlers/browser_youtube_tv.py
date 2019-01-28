@@ -124,6 +124,7 @@ class BrowserYouTubeTVIntentHandler(HandlerBase):
             notify_send('select current focused item', 'You spoke: '+spoken_text, 'info')
             _send_key('Return')
         elif operation == 'close_tab':
+            notify_send('close the current tab', 'You spoke: '+spoken_text, 'info')
             _send_key('ctrl+w')
         elif operation == 'next_channel':
             notify_send('next channel', 'You spoke: '+spoken_text, 'info')
